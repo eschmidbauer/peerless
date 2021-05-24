@@ -3,7 +3,10 @@ package peerless
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+
+	"go.uber.org/zap"
 )
 
 const (
@@ -97,15 +100,21 @@ type APIService interface {
 }
 
 // New creates an initializes a API service.
-func New(url, customer, passcode, userid string) APIService {
-	return &service{
+func New(url string, customer string, passcode string, userid string, logger *zap.Logger) (APIService, error) {
+	s := &service{
 		URL: url,
 		Authentication: &authInfo{
 			Customer: customer,
 			PassCode: passcode,
 			UserId:   userid,
 		},
+		logger: logger,
 	}
+	if s.URL == "" {
+		return s, fmt.Errorf("must provider url")
+	}
+	s.logger.Debug("setup new service", zap.String("url", url), zap.String("customer", customer), zap.String("userid", userid))
+	return s, nil
 }
 
 // service implements the APIService interface.
@@ -118,6 +127,7 @@ type service struct {
 	Envelope               string       // Optional SOAP Envelope
 	Config                 *http.Client // Optional HTTP client
 	Authentication         *authInfo    // Authentication
+	logger                 *zap.Logger
 }
 
 // ActivateSOA was auto-generated from WSDL.

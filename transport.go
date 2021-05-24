@@ -8,6 +8,8 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+
+	"go.uber.org/zap"
 )
 
 type soapRespone struct {
@@ -67,6 +69,7 @@ func (s *service) call(ctx context.Context, operation requestBody) (*responseBod
 	if err != nil {
 		return nil, err
 	}
+	s.logger.Debug("performing request", zap.ByteString("payload", payload))
 
 	cli := s.Config
 	if cli == nil {
