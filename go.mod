@@ -1,3 +1,3 @@
-module github.com/ubogdan/peerless
+module github.com/eschmidbauer/peerless
 
-go 1.13
+go 1.16
